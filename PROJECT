@@ -1,0 +1,5 @@
+domain: microsoft.com
+layout: go.kubebuilder.io/v3
+projectName: nodify
+repo: github.com/juan-lee/nodify
+version: 3-alpha
