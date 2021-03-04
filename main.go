@@ -25,7 +25,7 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 )
 
-func init() {
+func init() { // nolint: gochecknoinits
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(azurev1alpha1.AddToScheme(scheme))

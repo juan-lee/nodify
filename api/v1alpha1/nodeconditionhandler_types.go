@@ -43,6 +43,6 @@ type NodeConditionHandlerList struct {
 	Items           []NodeConditionHandler `json:"items"`
 }
 
-func init() {
+func init() { // nolint: gochecknoinits
 	SchemeBuilder.Register(&NodeConditionHandler{}, &NodeConditionHandlerList{})
 }

@@ -15,17 +15,17 @@ all: manager
 
 # Run tests
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
-test: generate fmt vet manifests
+test: generate fmt lint manifests
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.7.0/hack/setup-envtest.sh
 	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test ./... -coverprofile cover.out
 
 # Build manager binary
-manager: generate fmt vet
+manager: generate fmt lint
 	go build -o bin/manager main.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
-run: generate fmt vet manifests
+run: generate fmt lint manifests
 	go run ./main.go
 
 # Install CRDs into a cluster
@@ -53,9 +53,9 @@ manifests: controller-gen
 fmt:
 	go fmt ./...
 
-# Run go vet against code
-vet:
-	go vet ./...
+# Run go golangci-lint against code
+lint: golangci-lint
+	$(GOLANGCI_LINT) run -v --fast=false
 
 # Generate code
 generate: controller-gen
@@ -78,6 +78,11 @@ controller-gen:
 KUSTOMIZE = $(shell pwd)/bin/kustomize
 kustomize:
 	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v3.8.7)
+
+# Download golangci-lint locally if necessary
+GOLANGCI_LINT = $(shell pwd)/bin/golangci-lint
+golangci-lint:
+	$(call go-get-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint@v1.37.1)
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
