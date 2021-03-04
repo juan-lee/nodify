@@ -1,0 +1,7 @@
+apiVersion: azure.microsoft.com/v1alpha1
+kind: NodeConditionHandler
+metadata:
+  name: nodeconditionhandler-sample
+spec:
+  # Add fields here
+  foo: bar

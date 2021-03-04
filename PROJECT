@@ -2,4 +2,10 @@ domain: microsoft.com
 layout: go.kubebuilder.io/v3
 projectName: nodify
 repo: github.com/juan-lee/nodify
+resources:
+- api:
+    crdVersion: v1
+  group: azure
+  kind: NodeConditionHandler
+  version: v1alpha1
 version: 3-alpha
