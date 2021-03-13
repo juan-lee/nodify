@@ -1,7 +1,7 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= nodify-controller:latest
-DAEMON_IMG ?= nodify-daemon:latest
+IMG ?= juanlee/nodify-controller:latest
+DAEMON_IMG ?= juanlee/nodify-daemon:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
@@ -42,6 +42,8 @@ deploy: manifests kustomize
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	cd config/daemon && $(KUSTOMIZE) edit set image daemon=${DAEMON_IMG}
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
+	kubectl rollout -n nodify-system restart deploy/nodify-controller-manager
+	kubectl rollout -n nodify-system restart daemonset/nodify-nodify
 
 # UnDeploy controller from the configured Kubernetes cluster in ~/.kube/config
 undeploy:
@@ -50,6 +52,7 @@ undeploy:
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	cd daemon && $(CONTROLLER_GEN) paths=. rbac:roleName=daemon-role output:rbac:dir=../config/daemon
 
 # Run go fmt against code
 fmt:

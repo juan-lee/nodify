@@ -2,9 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - daemon.yaml
+- role.yaml
+- role_binding.yaml
 generatorOptions:
   disableNameSuffixHash: true
 images:
 - name: daemon
-  newName: nodify-daemon
+  newName: juanlee/nodify-daemon
   newTag: latest
