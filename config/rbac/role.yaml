@@ -7,9 +7,10 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - azure.microsoft.com
+  - ""
   resources:
-  - nodeconditionhandlers
+  - nodes
+  - pods
   verbs:
   - create
   - delete
@@ -19,15 +20,42 @@ rules:
   - update
   - watch
 - apiGroups:
-  - azure.microsoft.com
+  - ""
   resources:
-  - nodeconditionhandlers/finalizers
+  - nodes/status
+  - pods/status
   verbs:
+  - get
+  - patch
   - update
 - apiGroups:
-  - azure.microsoft.com
+  - ""
   resources:
-  - nodeconditionhandlers/status
+  - pods/eviction
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets/status
   verbs:
   - get
   - patch

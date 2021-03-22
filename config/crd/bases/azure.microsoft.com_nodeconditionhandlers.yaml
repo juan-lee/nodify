@@ -14,7 +14,7 @@ spec:
     listKind: NodeConditionHandlerList
     plural: nodeconditionhandlers
     singular: nodeconditionhandler
-  scope: Namespaced
+  scope: Cluster
   versions:
   - name: v1alpha1
     schema:

@@ -24,6 +24,7 @@ type NodeConditionHandlerStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:resource:scope=Cluster
 
 // NodeConditionHandler is the Schema for the nodeconditionhandlers API
 type NodeConditionHandler struct {
