@@ -8,5 +8,4 @@ generatorOptions:
   disableNameSuffixHash: true
 images:
 - name: daemon
-  newName: juanlee/nodify-daemon
-  newTag: latest
+  newName: juanlee/nodify-daemon:{{ .Tag }}

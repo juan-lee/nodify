@@ -1,7 +1,11 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= juanlee/nodify-controller:latest
-DAEMON_IMG ?= juanlee/nodify-daemon:latest
+TAG ?= dev
+REGISTRY ?= juanlee
+CONTROLLER_IMG ?= nodify-controller
+DAEMON_IMG ?= nodify-daemon
+CONTROLLER_URI ?= $(REGISTRY)/$(CONTROLLER_IMG):$(TAG)
+DAEMON_URI ?= $(REGISTRY)/$(DAEMON_IMG):$(TAG)
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
@@ -37,10 +41,12 @@ install: manifests kustomize
 uninstall: manifests kustomize
 	$(KUSTOMIZE) build config/crd | kubectl delete -f -
 
+set-images: manifests kustomize
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${CONTROLLER_URI}
+	cd config/daemon && $(KUSTOMIZE) edit set image daemon=${DAEMON_URI}
+
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
-deploy: manifests kustomize
-	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
-	cd config/daemon && $(KUSTOMIZE) edit set image daemon=${DAEMON_IMG}
+deploy: set-images
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
 	kubectl rollout -n nodify-system restart deploy/nodify-controller-manager
 	kubectl rollout -n nodify-system restart daemonset/nodify-nodify
@@ -68,13 +74,18 @@ generate: controller-gen
 
 # Build the docker image
 docker-build: test
-	docker build -t ${IMG} .
-	docker build -t ${DAEMON_IMG} -f Dockerfile.daemon .
+	docker build -t ${CONTROLLER_URI} .
+	docker build -t ${DAEMON_URI} -f Dockerfile.daemon .
 
 # Push the docker image
 docker-push:
-	docker push ${IMG}
-	docker push ${DAEMON_IMG}
+	docker push ${CONTROLLER_URI}
+	docker push ${DAEMON_URI}
+
+# Release
+release: set-images
+	mkdir -p dist
+	$(KUSTOMIZE) build config/default > bin/nodify.yaml
 
 # Download controller-gen locally if necessary
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
@@ -90,6 +101,11 @@ kustomize:
 GOLANGCI_LINT = $(shell pwd)/bin/golangci-lint
 golangci-lint:
 	$(call go-get-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint@v1.37.1)
+
+# Download goreleaser locally if necessary
+GORELEASER = $(shell pwd)/bin/goreleaser
+goreleaser:
+	$(call go-get-tool,$(GORELEASER),github.com/goreleaser/goreleaser@v0.160.0)
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))

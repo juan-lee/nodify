@@ -10,5 +10,4 @@ configMapGenerator:
   name: manager-config
 images:
 - name: controller
-  newName: juanlee/nodify-controller
-  newTag: latest
+  newName: juanlee/nodify-controller:{{ .Tag }}
