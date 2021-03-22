@@ -76,6 +76,10 @@ docker-push:
 	docker push ${IMG}
 	docker push ${DAEMON_IMG}
 
+# Release
+release: goreleaser
+	$(GORELEASER) --snapshot --skip-publish --rm-dist
+
 # Download controller-gen locally if necessary
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
 controller-gen:
@@ -90,6 +94,11 @@ kustomize:
 GOLANGCI_LINT = $(shell pwd)/bin/golangci-lint
 golangci-lint:
 	$(call go-get-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint@v1.37.1)
+
+# Download goreleaser locally if necessary
+GORELEASER = $(shell pwd)/bin/goreleaser
+goreleaser:
+	$(call go-get-tool,$(GORELEASER),github.com/goreleaser/goreleaser@v0.160.0)
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))

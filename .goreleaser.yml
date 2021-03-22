@@ -1,0 +1,50 @@
+before:
+  hooks:
+  - go mod tidy
+builds:
+- env:
+  - CGO_ENABLED=0
+  goos:
+  - linux
+  goarch:
+  - amd64
+checksum:
+  name_template: '{{ .ProjectName }}_checksums.txt'
+dockers:
+- image_templates:
+  - "juanlee/nodify-controller:{{ .Tag }}"
+  - "juanlee/nodify-controller:latest"
+  dockerfile: Dockerfile
+  extra_files:
+  - go.mod 
+  - go.sum 
+  - main.go
+  - api
+  - controllers
+- image_templates:
+  - "juanlee/nodify-daemon:{{ .Tag }}"
+  - "juanlee/nodify-daemon:latest"
+  dockerfile: Dockerfile.daemon
+  extra_files:
+  - daemon/go.mod 
+  - daemon/go.sum 
+  - daemon/main.go
+docker_manifests:
+- name_template: "juanlee/nodify-daemon:{{ .Tag }}"
+  image_templates:
+  - "juanlee/nodify-daemon:{{ .Tag }}"
+- name_template: "juanlee/nodify-daemon:latest"
+  image_templates:
+  - "juanlee/nodify-daemon:{{ .Tag }}"
+archives:
+  - replacements:
+      linux: Linux
+      amd64: x86_64
+snapshot:
+  name_template: "{{ .Tag }}-{{ .ShortCommit }}"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
