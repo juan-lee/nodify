@@ -1,4 +1,4 @@
-
+SHELL := /bin/bash
 # Image URL to use all building/pushing image targets
 TAG ?= dev
 REGISTRY ?= juanlee
@@ -66,7 +66,7 @@ fmt:
 
 # Run go golangci-lint against code
 lint: golangci-lint
-	$(GOLANGCI_LINT) run -v --fast=false
+	$(GOLANGCI_LINT) run -v --fast=false --timeout=5m
 
 # Generate code
 generate: controller-gen
