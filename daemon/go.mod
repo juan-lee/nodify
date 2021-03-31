@@ -1,4 +1,4 @@
-module github.com/juan-lee/nodify/daemon
+module daemon
 
 go 1.15
 
