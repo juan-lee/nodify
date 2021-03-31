@@ -30,6 +30,7 @@ dockers:
   - daemon/go.mod 
   - daemon/go.sum 
   - daemon/main.go
+  - daemon/metadata
 archives:
   - replacements:
       linux: Linux

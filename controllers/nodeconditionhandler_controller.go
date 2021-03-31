@@ -60,14 +60,14 @@ func (r *NodeConditionHandlerReconciler) Reconcile(ctx context.Context, req ctrl
 			if err := r.uncordon(&node); err != nil {
 				return ctrl.Result{}, err
 			}
-			return ctrl.Result{}, nil
 		}
+	case "Freeze":
+		log.Info("The Virtual Machine is scheduled to pause for a few seconds.", "condition", nodeCondition)
 	case "Reboot", "Redeploy", "Prempt", "Terminate":
 		log.Info("Maintenance required", "condition", nodeCondition)
 		if err := r.cordonAndDrain(&node); err != nil {
 			return ctrl.Result{}, err
 		}
-		return ctrl.Result{}, nil
 	}
 
 	return ctrl.Result{}, nil
@@ -80,12 +80,10 @@ func (r *NodeConditionHandlerReconciler) cordonAndDrain(node *corev1.Node) error
 	if err := kctldrain.RunCordonOrUncordon(helper, node, true); err != nil {
 		return err
 	}
-	log.Info("Finished cordoning node")
 	log.Info("Draining node")
 	if err := kctldrain.RunNodeDrain(helper, node.Name); err != nil {
 		log.Info("Errors draining node", "err", err)
 	}
-	log.Info("Finished draining node")
 	return nil
 }
 
@@ -96,7 +94,6 @@ func (r *NodeConditionHandlerReconciler) uncordon(node *corev1.Node) error {
 	if err := kctldrain.RunCordonOrUncordon(helper, node, false); err != nil {
 		return err
 	}
-	log.Info("Finished uncordoning node")
 	return nil
 }
 
@@ -131,7 +128,7 @@ func getMaintenanceCondition(node *corev1.Node) (*corev1.NodeCondition, error) {
 	return nil, errors.New("missing MaintenanceScheduled NodeCondition")
 }
 
-// writer implements io.Writer interface as a pass-through for klog.
+// writer implements io.Writer interface as a pass-through for logr.
 type writer struct {
 	logFunc func(msg string, args ...interface{})
 }
